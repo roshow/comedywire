@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" ng-app="chairsApp">
+  <head>
+    <meta charset="utf-8">
+    <title>ComedyWire Fun by Rolando Garcia </title>
+    
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="app.css" />
+    
+    <script src="node_modules/angular/angular.js"></script>
+    
+    <style type="text/css">
+      .chair-box {
+        text-align: center;
+      }
+      .hide-that-chair {
+        opacity: 0;
+        color: red;
+        transition: opacity 1s ease-in-out;
+      }
+    </style>
+
+  </head>
+
+  <body ng-controller="ChairsController">
+
+
+    <div class="container">
+      <div><input type="number" name="num-of-chairs" ng-model="numberOfChairs" /><button ng-click="runIt();">run it</button></div>
+      <p>Removed chairs: {{removedChairs.join(', ')}}</p>
+      <div class="row">
+        <div 
+          class="col-sm-1 chair-box" 
+          ng-repeat="chair in listOfChairs track by $index"
+          ng-class="{ 'hide-that-chair': chair === 0 }"
+        >
+          <h3>{{$index+1}}</h3>
+        </div>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+      (function () {
+          'use strict';
+          angular
+            .module('chairsApp', [])
+            .controller('ChairsController', function ChairsController($scope, $interval) {
+              $scope.listOfChairs = [];
+              $scope.removedChairs = [];
+              $scope.numberOfChairs = 100;
+
+              var delay = 1000;
+
+              function removeAChair (chairs, s) {
+                for (var i = s; i--;) {
+                  chairs.push(chairs.shift());
+                }
+                var removedChair = chairs.shift();
+                $scope.removedChairs.push(removedChair);
+                return [chairs, removedChair];
+              }
+              var removeInterval;
+              function lastChairStanding (chairs, s) {
+                s = s || 0;
+                return new Promise(function (resolve, reject) {
+                  $scope.removedChairs = [];
+                  removeInterval = $interval(function () {
+                    var removedArr = removeAChair(chairs, s);
+                    $scope.listOfChairs[$scope.listOfChairs.indexOf(removedArr[1])] = 0;
+                    s++;
+                    chairs = removedArr[0];
+                    if (chairs.length === 1) {
+                      resolve(chairs);
+                      $interval.cancel(removeInterval);
+                    }
+                  }, delay);
+                });
+              }
+
+              function makeChairArray (numOfChairs) {
+                numOfChairs = parseInt( (numOfChairs || 7), 10 );
+                var chairs = [];
+                for (var i = 1, l = (numOfChairs + 1); i < l; i++) {
+                  chairs.push(i);
+                }
+                return chairs;
+              }
+
+
+              function init () {
+                var numOfChairs = $scope.numberOfChairs;
+                $scope.listOfChairs = makeChairArray(numOfChairs);
+                var copiedArray = [].concat($scope.listOfChairs);
+                return lastChairStanding(copiedArray);
+              }
+
+              $scope.runIt = function () {
+                $interval.cancel(removeInterval);
+                init();
+              };
+              init();
+            });
+      }());
+    </script>
+
+  </body>
+
+</html>

@@ -1,8 +1,7 @@
 {
-  "name": "comedywirerolandogarcia",
+  "name": "comedywire-rolandogarcia",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Comedy Wire Code Exercise",
   "dependencies": {
     "bower": "^1.7.9"
   },
@@ -10,6 +9,6 @@
   "scripts": {
     "start": "http-server"
   },
-  "author": "rolando garcia",
+  "author": "Rolando Garcia",
   "license": "ISC"
 }
